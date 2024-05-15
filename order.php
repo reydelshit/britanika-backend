@@ -10,7 +10,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        $sql = "SELECT * FROM dishes ORDER BY dish_id DESC";
+        $sql = "SELECT * FROM carts ORDER BY cart_id DESC";
 
 
         // if (isset($_GET['post_id'])) {
@@ -28,48 +28,45 @@ switch ($method) {
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();
-            $dishes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $carts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo json_encode($dishes);
+            echo json_encode($carts);
         }
 
 
         break;
 
     case "POST":
-        $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO dishes (dish_name, dish_price, availability_status, created_at, dish_image) VALUES (:dish_name, :dish_price, :availability_status, :created_at, :dish_image)";
+        $order = json_decode(file_get_contents('php://input'));
+        $sql = "INSERT INTO orders (order_customer_name, amount, created_at, status, dish_id, quantity) VALUES (:order_customer_name, :amount, :created_at, :status, :dish_id, :quantity)";
         $stmt = $conn->prepare($sql);
 
         $created_at = date('Y-m-d');
-        $stmt->bindParam(':dish_name', $dishes->dish_name);
-        $stmt->bindParam(':dish_price', $dishes->dish_price);
-        $stmt->bindParam(':availability_status', $dishes->availability_status);
-        $stmt->bindParam(':dish_image', $dishes->dish_image);
-        $stmt->bindParam(':created_at',  $created_at);
-
-
+        $stmt->bindParam(':order_customer_name', $order->order_customer_name);
+        $stmt->bindParam(':amount', $order->amount);
+        $stmt->bindParam(':created_at', $created_at);
+        $stmt->bindParam(':status', $order->status);
+        $stmt->bindParam(':dish_id', $order->dish_id);
+        $stmt->bindParam(':quantity', $order->quantity);
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "dish successfully"
+                "message" => "Order successfully placed"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "dish failed"
+                "message" => "Failed to place order"
             ];
         }
-
-
 
 
         echo json_encode($response);
         break;
 
     case "PUT":
-        $dishes = json_decode(file_get_contents('php://input'));
+        $carts = json_decode(file_get_contents('php://input'));
         $sql = "UPDATE post 
         SET post_context = :post_context,
             post_image = :post_image,
@@ -82,14 +79,14 @@ switch ($method) {
 
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':post_id', $dishes->post_id);
-        $stmt->bindParam(':post_context', $dishes->post_context);
-        $stmt->bindParam(':post_image', $dishes->post_image);
-        $stmt->bindParam(':project_location', $dishes->project_location);
-        $stmt->bindParam(':project_name', $dishes->project_name);
-        $stmt->bindParam(':email_phone', $dishes->email_phone);
-        $stmt->bindParam(':starting_price', $dishes->starting_price);
-        $stmt->bindParam(':close_until', $dishes->close_until);
+        $stmt->bindParam(':post_id', $carts->post_id);
+        $stmt->bindParam(':post_context', $carts->post_context);
+        $stmt->bindParam(':post_image', $carts->post_image);
+        $stmt->bindParam(':project_location', $carts->project_location);
+        $stmt->bindParam(':project_name', $carts->project_name);
+        $stmt->bindParam(':email_phone', $carts->email_phone);
+        $stmt->bindParam(':starting_price', $carts->starting_price);
+        $stmt->bindParam(':close_until', $carts->close_until);
 
         if ($stmt->execute()) {
             $response = [
@@ -105,20 +102,20 @@ switch ($method) {
 
         break;
     case "DELETE":
-        $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "DELETE FROM dishes WHERE dish_id = :dish_id";
+        $carts = json_decode(file_get_contents('php://input'));
+        $sql = "DELETE FROM carts WHERE cart_id = :cart_id";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':dish_id', $dishes->dish_id);
+        $stmt->bindParam(':cart_id', $carts->cart_id);
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "dishes deleted successfully"
+                "message" => "carts deleted successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "dishes delete failed"
+                "message" => "carts delete failed"
             ];
         }
 

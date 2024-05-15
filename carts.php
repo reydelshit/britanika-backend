@@ -108,9 +108,9 @@ switch ($method) {
         break;
     case "DELETE":
         $carts = json_decode(file_get_contents('php://input'));
-        $sql = "DELETE FROM post WHERE post_id = :post_id";
+        $sql = "DELETE FROM carts WHERE cart_id = :cart_id";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':post_id', $carts->post_id);
+        $stmt->bindParam(':cart_id', $carts->cart_id);
 
         if ($stmt->execute()) {
             $response = [
