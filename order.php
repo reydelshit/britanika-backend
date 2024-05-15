@@ -67,36 +67,24 @@ switch ($method) {
 
     case "PUT":
         $carts = json_decode(file_get_contents('php://input'));
-        $sql = "UPDATE post 
-        SET post_context = :post_context,
-            post_image = :post_image,
-            project_location = :project_location,
-            project_name = :project_name,
-            email_phone = :email_phone,
-            starting_price = :starting_price,
-            close_until = :close_until
-        WHERE post_id = :post_id";
+        $sql = "UPDATE orders 
+        SET status = :status
+        WHERE order_id = :order_id";
 
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':post_id', $carts->post_id);
-        $stmt->bindParam(':post_context', $carts->post_context);
-        $stmt->bindParam(':post_image', $carts->post_image);
-        $stmt->bindParam(':project_location', $carts->project_location);
-        $stmt->bindParam(':project_name', $carts->project_name);
-        $stmt->bindParam(':email_phone', $carts->email_phone);
-        $stmt->bindParam(':starting_price', $carts->starting_price);
-        $stmt->bindParam(':close_until', $carts->close_until);
+        $stmt->bindParam(':order_id', $carts->order_id);
+        $stmt->bindParam(':status', $carts->status);
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "post updated successfully"
+                "message" => "order_id updated successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "post update failed"
+                "message" => "order_id update failed"
             ];
         }
 
