@@ -70,26 +70,15 @@ switch ($method) {
 
     case "PUT":
         $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "UPDATE post 
-        SET post_context = :post_context,
-            post_image = :post_image,
-            project_location = :project_location,
-            project_name = :project_name,
-            email_phone = :email_phone,
-            starting_price = :starting_price,
-            close_until = :close_until
-        WHERE post_id = :post_id";
+        $sql = "UPDATE dishes 
+        SET availability_status = :availability_status
+        WHERE dish_id = :dish_id";
 
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':post_id', $dishes->post_id);
-        $stmt->bindParam(':post_context', $dishes->post_context);
-        $stmt->bindParam(':post_image', $dishes->post_image);
-        $stmt->bindParam(':project_location', $dishes->project_location);
-        $stmt->bindParam(':project_name', $dishes->project_name);
-        $stmt->bindParam(':email_phone', $dishes->email_phone);
-        $stmt->bindParam(':starting_price', $dishes->starting_price);
-        $stmt->bindParam(':close_until', $dishes->close_until);
+        $stmt->bindParam(':dish_id', $dishes->dish_id);
+        $stmt->bindParam(':availability_status', $dishes->availability_status);
+
 
         if ($stmt->execute()) {
             $response = [
