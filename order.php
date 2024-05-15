@@ -10,7 +10,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        $sql = "SELECT * FROM carts ORDER BY cart_id DESC";
+        $sql = "SELECT * FROM orders ORDER BY order_id DESC";
 
 
         // if (isset($_GET['post_id'])) {
