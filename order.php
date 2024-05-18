@@ -37,30 +37,66 @@ switch ($method) {
         break;
 
     case "POST":
-        $order = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO orders (order_customer_name, amount, created_at, status, dish_id, quantity) VALUES (:order_customer_name, :amount, :created_at, :status, :dish_id, :quantity)";
-        $stmt = $conn->prepare($sql);
+        $order = json_decode(file_get_contents('php://input'), true);
 
+        $order_customer_name = $order['order_customer_name'];
+        $amount = $order['amount'];
         $created_at = date('Y-m-d');
-        $stmt->bindParam(':order_customer_name', $order->order_customer_name);
-        $stmt->bindParam(':amount', $order->amount);
-        $stmt->bindParam(':created_at', $created_at);
-        $stmt->bindParam(':status', $order->status);
-        $stmt->bindParam(':dish_id', $order->dish_id);
-        $stmt->bindParam(':quantity', $order->quantity);
+        $status = 'Pending'; // Assuming you have a default status
 
-        if ($stmt->execute()) {
+        try {
+            $conn->beginTransaction();
+
+            // Insert the order into the orders table
+            $sql = "INSERT INTO orders (order_customer_name, amount, created_at, status) 
+                        VALUES (:order_customer_name, :amount, :created_at, :status)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':order_customer_name', $order_customer_name);
+            $stmt->bindParam(':amount', $amount);
+            $stmt->bindParam(':created_at', $created_at);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+
+            // Get the last inserted order ID
+            $order_id = $conn->lastInsertId();
+
+            // Insert each product in the order_products table
+            $sql = "INSERT INTO order_products (order_id, product_id, quantity, created_at) 
+                        VALUES (:order_id, :product_id, :quantity, :created_at)";
+            $stmt = $conn->prepare($sql);
+
+
+            $sql2 = "UPDATE cart 
+            SET isPaid = 1
+            WHERE cart_id = :cart_id";
+
+            $stmt2 = $conn->prepare($sql2);
+
+            foreach ($order['products'] as $product) {
+                $stmt->bindParam(':order_id', $order_id);
+                $stmt->bindParam(':product_id', $product['product_id']);
+                $stmt->bindParam(':quantity', $product['quantity']);
+                $stmt->bindParam(':created_at', $created_at);
+
+                $stmt->execute();
+
+                $stmt2->bindParam(':cart_id', $product['cart_id']);
+                $stmt2->execute();
+            }
+
+            $conn->commit();
+
             $response = [
                 "status" => "success",
                 "message" => "Order successfully placed"
             ];
-        } else {
+        } catch (Exception $e) {
+            $conn->rollBack();
             $response = [
                 "status" => "error",
                 "message" => "Failed to place order"
             ];
         }
-
 
         echo json_encode($response);
         break;

@@ -10,7 +10,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        $sql = "SELECT * FROM dishes ORDER BY dish_id DESC";
+        $sql = "SELECT * FROM products ORDER BY product_id DESC";
 
 
         // if (isset($_GET['post_id'])) {
@@ -28,37 +28,39 @@ switch ($method) {
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();
-            $dishes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo json_encode($dishes);
+            echo json_encode($products);
         }
 
 
         break;
 
     case "POST":
-        $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO dishes (dish_name, dish_price, availability_status, created_at, dish_image) VALUES (:dish_name, :dish_price, :availability_status, :created_at, :dish_image)";
+        $products = json_decode(file_get_contents('php://input'));
+        $sql = "INSERT INTO products (product_name, product_price, availability_status, created_at, product_image, stocks) VALUES (:product_name, :product_price, :availability_status, :created_at, :product_image, :stocks)";
         $stmt = $conn->prepare($sql);
 
         $created_at = date('Y-m-d');
-        $stmt->bindParam(':dish_name', $dishes->dish_name);
-        $stmt->bindParam(':dish_price', $dishes->dish_price);
-        $stmt->bindParam(':availability_status', $dishes->availability_status);
-        $stmt->bindParam(':dish_image', $dishes->dish_image);
+        $stmt->bindParam(':product_name', $products->product_name);
+        $stmt->bindParam(':product_price', $products->product_price);
+        $stmt->bindParam(':availability_status', $products->availability_status);
+        $stmt->bindParam(':product_image', $products->product_image);
         $stmt->bindParam(':created_at',  $created_at);
+        $stmt->bindParam(':stocks', $products->stocks);
+
 
 
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "dish successfully"
+                "message" => "product successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "dish failed"
+                "message" => "product failed"
             ];
         }
 
@@ -69,15 +71,15 @@ switch ($method) {
         break;
 
     case "PUT":
-        $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "UPDATE dishes 
+        $products = json_decode(file_get_contents('php://input'));
+        $sql = "UPDATE products 
         SET availability_status = :availability_status
-        WHERE dish_id = :dish_id";
+        WHERE product_id = :product_id";
 
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':dish_id', $dishes->dish_id);
-        $stmt->bindParam(':availability_status', $dishes->availability_status);
+        $stmt->bindParam(':product_id', $products->product_id);
+        $stmt->bindParam(':availability_status', $products->availability_status);
 
 
         if ($stmt->execute()) {
@@ -94,20 +96,20 @@ switch ($method) {
 
         break;
     case "DELETE":
-        $dishes = json_decode(file_get_contents('php://input'));
-        $sql = "DELETE FROM dishes WHERE dish_id = :dish_id";
+        $products = json_decode(file_get_contents('php://input'));
+        $sql = "DELETE FROM products WHERE product_id = :product_id";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':dish_id', $dishes->dish_id);
+        $stmt->bindParam(':product_id', $products->product_id);
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "dishes deleted successfully"
+                "message" => "products deleted successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "dishes delete failed"
+                "message" => "products delete failed"
             ];
         }
 

@@ -10,7 +10,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        $sql = "SELECT * FROM carts ORDER BY cart_id DESC";
+        $sql = "SELECT * FROM driving_range ORDER BY range_id DESC";
 
 
         // if (isset($_GET['post_id'])) {
@@ -28,26 +28,26 @@ switch ($method) {
             $stmt = $conn->prepare($sql);
 
             $stmt->execute();
-            $carts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $driving_range = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo json_encode($carts);
+            echo json_encode($driving_range);
         }
 
 
         break;
 
     case "POST":
-        $carts = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO carts (cart_image, cart_number, price, color, created_at, type, availability_status) VALUES (:cart_image, :cart_number, :price, :color, :created_at, :type, :availability_status)";
+        $driving_range = json_decode(file_get_contents('php://input'));
+        $sql = "INSERT INTO driving_range (range_image, range_number, price, color, created_at, type, availability_status) VALUES (:range_image, :range_number, :price, :color, :created_at, :type, :availability_status)";
         $stmt = $conn->prepare($sql);
 
         $created_at = date('Y-m-d');
-        $stmt->bindParam(':cart_image', $carts->cart_image);
-        $stmt->bindParam(':cart_number', $carts->cart_number);
-        $stmt->bindParam(':price', $carts->price);
-        $stmt->bindParam(':color', $carts->color);
-        $stmt->bindParam(':type', $carts->type);
-        $stmt->bindParam(':availability_status', $carts->availability_status);
+        $stmt->bindParam(':range_image', $driving_range->range_image);
+        $stmt->bindParam(':range_number', $driving_range->range_number);
+        $stmt->bindParam(':price', $driving_range->price);
+        $stmt->bindParam(':color', $driving_range->color);
+        $stmt->bindParam(':type', $driving_range->type);
+        $stmt->bindParam(':availability_status', $driving_range->availability_status);
         $stmt->bindParam(':created_at',  $created_at);
 
 
@@ -55,12 +55,12 @@ switch ($method) {
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "cart successfully"
+                "message" => "range successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "cart failed"
+                "message" => "range failed"
             ];
         }
 
@@ -71,15 +71,15 @@ switch ($method) {
         break;
 
     case "PUT":
-        $carts = json_decode(file_get_contents('php://input'));
-        $sql = "UPDATE carts 
+        $driving_range = json_decode(file_get_contents('php://input'));
+        $sql = "UPDATE driving_range 
         SET availability_status = :availability_status
-        WHERE cart_id = :cart_id";
+        WHERE range_id = :range_id";
 
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':cart_id', $carts->cart_id);
-        $stmt->bindParam(':availability_status', $carts->availability_status);
+        $stmt->bindParam(':range_id', $driving_range->range_id);
+        $stmt->bindParam(':availability_status', $driving_range->availability_status);
 
         if ($stmt->execute()) {
             $response = [
@@ -95,20 +95,20 @@ switch ($method) {
 
         break;
     case "DELETE":
-        $carts = json_decode(file_get_contents('php://input'));
-        $sql = "DELETE FROM carts WHERE cart_id = :cart_id";
+        $driving_range = json_decode(file_get_contents('php://input'));
+        $sql = "DELETE FROM driving_range WHERE range_id = :range_id";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':cart_id', $carts->cart_id);
+        $stmt->bindParam(':range_id', $driving_range->range_id);
 
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "carts deleted successfully"
+                "message" => "driving_range deleted successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "carts delete failed"
+                "message" => "driving_range delete failed"
             ];
         }
 
