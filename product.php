@@ -50,9 +50,16 @@ switch ($method) {
         $stmt->bindParam(':stocks', $products->stocks);
 
 
-
+        $sql2 = "INSERT INTO stocks (product_id, quantity, created_at, stock_type) VALUES (:product_id, :quantity, :created_at, :stock_type)";
+        $type = "Initial Stock";
+        $stmt2 = $conn->prepare($sql2);
+        $stmt2->bindParam(':product_id', $products->product_id);
+        $stmt2->bindParam(':quantity', $products->stocks);
+        $stmt2->bindParam(':created_at',  $created_at);
+        $stmt2->bindParam(':stock_type', $type);
 
         if ($stmt->execute()) {
+            $stmt2->execute();
             $response = [
                 "status" => "success",
                 "message" => "product successfully"

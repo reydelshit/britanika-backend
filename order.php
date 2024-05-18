@@ -72,6 +72,13 @@ switch ($method) {
 
             $stmt2 = $conn->prepare($sql2);
 
+            $sql3 = "UPDATE products SET stocks = stocks - :quantity WHERE product_id = :product_id";
+            $stmt3 = $conn->prepare($sql3);
+
+            $type = 'out';
+            $sql4 = "INSERT INTO stocks (product_id, quantity, created_at, stock_type) VALUES (:product_id, :quantity, :created_at, :stock_type)";
+            $stmt4 = $conn->prepare($sql4);
+
             foreach ($order['products'] as $product) {
                 $stmt->bindParam(':order_id', $order_id);
                 $stmt->bindParam(':product_id', $product['product_id']);
@@ -82,6 +89,16 @@ switch ($method) {
 
                 $stmt2->bindParam(':cart_id', $product['cart_id']);
                 $stmt2->execute();
+
+                $stmt3->bindParam(':quantity', $product['quantity']);
+                $stmt3->bindParam(':product_id', $product['product_id']);
+                $stmt3->execute();
+
+                $stmt4->bindParam(':product_id', $product['product_id']);
+                $stmt4->bindParam(':quantity', $product['quantity']);
+                $stmt4->bindParam(':created_at', $created_at);
+                $stmt4->bindParam(':stock_type', $type);
+                $stmt4->execute();
             }
 
             $conn->commit();
