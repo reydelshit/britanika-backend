@@ -37,6 +37,18 @@ switch ($method) {
         $stmt->bindParam(':stocks', $cart->stocks);
 
         if ($stmt->execute()) {
+
+            $stockType = 'Stock In';
+            $sql2 = "INSERT INTO stocks (product_id, quantity, created_at, stock_type) VALUES (:product_id, :quantity, :created_at, :stock_type)";
+            $stmt2 = $conn->prepare($sql2);
+
+            $stmt2->bindParam(':product_id', $cart->product_id);
+            $stmt2->bindParam(':quantity', $cart->stocks);
+            $stmt2->bindParam(':created_at', $updated_at);
+            $stmt2->bindParam(':stock_type', $stockType);
+
+            $stmt2->execute();
+
             $response = [
                 "status" => "success",
                 "message" => "products updated successfully"

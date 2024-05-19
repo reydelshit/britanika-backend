@@ -75,7 +75,7 @@ switch ($method) {
             $sql3 = "UPDATE products SET stocks = stocks - :quantity WHERE product_id = :product_id";
             $stmt3 = $conn->prepare($sql3);
 
-            $type = 'out';
+            $type = 'Stock Out';
             $sql4 = "INSERT INTO stocks (product_id, quantity, created_at, stock_type) VALUES (:product_id, :quantity, :created_at, :stock_type)";
             $stmt4 = $conn->prepare($sql4);
 

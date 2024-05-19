@@ -10,17 +10,41 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        $sql = "SELECT orders.*, products.product_name, products.product_price, order_products.quantity FROM orders INNER JOIN order_products ON order_products.order_id = orders.order_id INNER JOIN products ON products.product_id = order_products.product_id ORDER BY orders.order_id DESC";
+        if (isset($_GET['expenses'])) {
+            $sql = "SELECT * FROM expenses ORDER BY created_at DESC";
+        }
+
+        if (isset($_GET['expense_with_products'])) {
+            $expense_id = $_GET['expense_id'];
+
+            $sql = "SELECT * FROM expense_product WHERE expense_id = :expense_id";
+        }
+
+        if (isset($_GET['expense_single'])) {
+            $expense_id = $_GET['expense_id'];
+
+            $sql = "SELECT * FROM expenses WHERE expense_id = :expense_id";
+        }
+
 
         if (isset($sql)) {
             $stmt = $conn->prepare($sql);
 
+            if (isset($expense_id)) {
+                $stmt->bindParam(':expense_id', $expense_id);
+            }
+
+            if (isset($_GET['expense_single'])) {
+                $stmt->bindParam(':expense_id', $expense_id);
+            }
+
+
+
             $stmt->execute();
-            $carts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo json_encode($carts);
+            echo json_encode($expenses);
         }
-
 
         break;
 
