@@ -28,13 +28,14 @@ switch ($method) {
 
     case "POST":
         $user = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO users (account_type, username, password, created_at) VALUES (:account_type, :username, :password, :created_at)";
+        $sql = "INSERT INTO users (account_type, username, password, created_at, if_staff_type) VALUES (:account_type, :username, :password, :created_at, :if_staff_type)";
         $stmt = $conn->prepare($sql);
         $created_at = date('Y-m-d');
         $stmt->bindParam(':account_type', $user->account_type);
         $stmt->bindParam(':username', $user->username);
         $stmt->bindParam(':password', $user->password);
         $stmt->bindParam(':created_at', $created_at);
+        $stmt->bindParam(':if_staff_type', $user->if_staff_type);
 
         if ($stmt->execute()) {
             $response = [
