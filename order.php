@@ -113,7 +113,7 @@ switch ($method) {
 
                 $product = $stmt6->fetch(PDO::FETCH_ASSOC);
 
-                if ($product['stocks'] < 50) {
+                if ($product['stocks'] < $product['stock_limit']) {
                     $notification_message = "Product " . $product['product_name'] . " with ID " . $product['product_id'] . " is running out of stock. Please restock";
                     $stmt5->bindParam(':notification_message', $notification_message);
                     $stmt5->bindParam(':created_at', $created_at);

@@ -64,8 +64,17 @@ switch ($method) {
             $sql = "UPDATE products SET stocks = stocks - :stocks WHERE product_id = :product_id";
             $stmt = $conn->prepare($sql);
             $updated_at = date('Y-m-d');
+            $created_at = date('Y-m-d');
             $stmt->bindParam(':product_id', $cart->product_id);
             $stmt->bindParam(':stocks', $cart->stocks);
+
+            $sql5 = "INSERT INTO notifications (notification_message, created_at) VALUES (:notification_message, :created_at)";
+            $stmt5 = $conn->prepare($sql5);
+
+
+            // check if the stocks of the product is less than 50 then notify the admin to restock of that product 
+            $sql6 = "SELECT * FROM products WHERE product_id = :product_id";
+            $stmt6 = $conn->prepare($sql6);
 
             if ($stmt->execute()) {
 
@@ -79,6 +88,20 @@ switch ($method) {
                 $stmt2->bindParam(':stock_type', $stockType);
 
                 $stmt2->execute();
+
+
+
+                $stmt6->bindParam(':product_id', $cart->product_id);
+                $stmt6->execute();
+
+                $product = $stmt6->fetch(PDO::FETCH_ASSOC);
+
+                if ($product['stocks'] < $product['stock_limit']) {
+                    $notification_message = "Product " . $product['product_name'] . " with ID " . $product['product_id'] . " is running out of stock. Please restock";
+                    $stmt5->bindParam(':notification_message', $notification_message);
+                    $stmt5->bindParam(':created_at', $created_at);
+                    $stmt5->execute();
+                }
 
                 $response = [
                     "status" => "success",
