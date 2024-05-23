@@ -4,7 +4,7 @@
 include 'DBconnect.php';
 $objDB = new DbConnect();
 $conn = $objDB->connect();
-
+date_default_timezone_set('Asia/Manila');
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {

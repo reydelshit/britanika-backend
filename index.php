@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('Asia/Manila');
 $request_uri = $_SERVER['REQUEST_URI'];
 
 $uri_parts = explode('/', trim($request_uri, '/'));
